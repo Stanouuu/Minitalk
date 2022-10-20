@@ -6,7 +6,7 @@
 /*   By: sbarrage <sbarrage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 12:22:14 by sbarrage          #+#    #+#             */
-/*   Updated: 2022/10/17 15:32:42 by sbarrage         ###   ########.fr       */
+/*   Updated: 2022/10/20 16:56:51 by sbarrage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,9 @@ char	*atob(int c)
 
 	i = c;
 	j = 0;
-	ft_printf("%c\n", c);
+	// ft_printf("%c\n", c);
 	if (c == '\0')
-	{
-		write(1, "this chracter is a '0'", 22);
-		return("00000000");
-	}
+		return ("00000000");
 	str = malloc(sizeof(char) * 8);
 	while (j < 8)
 		str[j++] = '0';
@@ -42,7 +39,8 @@ char	*atob(int c)
 		i = i / 2;
 		j++;
 	}
-	ft_printf("%d\n", j);
+	j = 7;
+	// ft_printf("%d\n", j);
 	while (j > 0)
 	{
 		// ft_printf("%d\n", j);
@@ -50,8 +48,8 @@ char	*atob(int c)
 		j--;
 		c = c / 2;
 	}
-	ft_printf("%s\n", str);
-	ft_printf("%d\n", ft_strlen(str));
+	// ft_printf("%s\n", str);
+	// ft_printf("%d\n", ft_strlen(str));
 	// ft_printf("%s\n", str);
 	return (str);
 }
@@ -61,20 +59,14 @@ void	action(int num)
 	ft_printf("%c\n", *bin[0]);
 	// if (bin[0] == "\0")
 	// 	bin[0] = atob(*bin[1]);
-	if (num)
+	if (num == 10)
 	{
 		if (*bin[0] == '0')
 			kill(ft_atoi(bin[2]), SIGUSR1);
-		else
+		else if (*bin[0] == '1')
 			kill(ft_atoi(bin[2]), SIGUSR2);
-		bin[0]++;
 	}
-	// else
-	// {
-	// 	free(bin[0]);
-	// 	bin[0] = NULL;
-	// }
-	
+	bin[0]++;
 }
 
 int	main(int argc, char **argv)
@@ -98,27 +90,22 @@ int	main(int argc, char **argv)
 		write(0, "Mauvais Nombre D'Arguments\n", 27);
 
 
-	bin[0] = atob(*bin[1]);
-	bin[1]++;
-	kill(ft_atoi(bin[2]), 60);
+	// bin[0] = atob(*bin[1]);
+	// bin[1]++;
 
+	sigaction(SIGUSR1,  &sa, NULL);
+	sigaction(SIGUSR2,  &sa, NULL);
+	
 	while (bin[1])
 	{
+		write(1, "k", 1);
 		bin[0] = atob(*bin[1]);
+		kill(ft_atoi(bin[2]), 60);
 		bin[1]++;
-		while (bin[0])
+		while (*bin[0])
 		{
-			sigaction(SIGUSR1,  &sa, NULL);
-			sigaction(SIGUSR2,  &sa, NULL);
-			// if (!bin[0])
-			// {
-			// 	free(bin[1]);
-			// 	free(bin[2]);
-			// 	free(bin);
-			// 	return (0);
-			// }
+			// write(1, "h", 1);
 		}
-		free(bin[0]);
 	}
 }
 

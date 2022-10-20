@@ -6,7 +6,7 @@
 /*   By: sbarrage <sbarrage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 12:22:17 by sbarrage          #+#    #+#             */
-/*   Updated: 2022/10/17 14:20:22 by sbarrage         ###   ########.fr       */
+/*   Updated: 2022/10/20 16:56:39 by sbarrage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,22 +18,35 @@
 
 char	*str;
 
+int	bitoi(char *str)
+{
+	int	res;
+	int	i;
+
+	i = 0;
+	res = 0;
+	while (str[i])
+	{
+		res = res * 2 + (str[i] - '0');
+		i++;
+	}
+	return (res);
+}
+
 void	action(int num, siginfo_t	*info, void *content)
 {
-	// while (i < 7
-	ft_printf("here %d\n", info->si_pid);
 	if (content)
 		(void)content;
-	// ft_printf("%s", pid);
-
-	if (ft_strlen(str) == 7)
+	if (num == 60)
 	{
-		free(str);
+		if (str)
+		{
+			ft_printf("%c", bitoi(str));
+			free(str);
+		}
 		str	= malloc(sizeof(char *));
-		str[0] = '\0';  
-		write(1, "\n", 1);
+		str[0] = '\0';
 	}
-	ft_printf("num : %d\n", ft_strlen(str));
 	if (num == 12)
 		str = ft_strjoin(str, "1");
 	if (num == 10)
@@ -44,50 +57,28 @@ void	action(int num, siginfo_t	*info, void *content)
 	// 	exit (0);
 	// }
 	kill(info->si_pid, SIGUSR1);
-
-	ft_printf("%s\n", str);
 }
 
 int	main(void)
 {
 	struct	sigaction sa;
 	
+	str = NULL;
 	sigemptyset(&sa.sa_mask);
 	sigaddset(&sa.sa_mask, SIGINT);
 	sa.sa_flags = SA_RESTART | SA_SIGINFO;
 	sa.sa_sigaction = &action;
 
-	ft_printf("%i\n", getpid());
-	str	= malloc(sizeof(char *));
-	str[0] = '\0';  
+	ft_printf("%i\n", getpid()); 
 	while (1)
 	{
-		// sleep(1);
 		sigaction(SIGUSR1,  &sa, NULL);
 		sigaction(60,  &sa, NULL);
+		sigaction(61,  &sa, NULL);
 		sigaction(SIGUSR2,  &sa, NULL);
-		// ft_printf("%s here\n", str);
 	}
 }
 
-// int	itohex(char *str, char *hex)
-// {
-// 	int	res;
-// 	int	i;
-// 	int	j;
 
-// 	i = 2;
-// 	res = 0;
-// 	while (str[i])
-// 	{
-// 		j = 0;
-// 		while (hex[j])
-// 		{
-// 			if (hex[j] == str[i] || ft_toupper(hex[j]) == str[i])
-// 				res = res * 16 + j;
-// 			j++;
-// 		}
-// 		i++;
-// 	}
-// 	return (res);
-// }
+
+
