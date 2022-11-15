@@ -6,7 +6,7 @@
 /*   By: sbarrage <sbarrage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 12:22:17 by sbarrage          #+#    #+#             */
-/*   Updated: 2022/10/20 16:56:39 by sbarrage         ###   ########.fr       */
+/*   Updated: 2022/11/15 16:03:33 by sbarrage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,33 +30,57 @@ int	bitoi(char *str)
 		res = res * 2 + (str[i] - '0');
 		i++;
 	}
+
 	return (res);
+}
+
+char	*newstr(char *str, char *nbr)
+{
+	char *tmp;
+
+	tmp = ft_strjoin(str, nbr);
+	free(str);
+	return (tmp);
 }
 
 void	action(int num, siginfo_t	*info, void *content)
 {
 	if (content)
 		(void)content;
-	if (num == 60)
+
+	// ft_printf("%d\n", info->si_pid);
+	// sleep(1);
+
+	if (num == SIGUSR1 && !str)
 	{
-		if (str)
-		{
-			ft_printf("%c", bitoi(str));
-			free(str);
-		}
 		str	= malloc(sizeof(char *));
 		str[0] = '\0';
 	}
-	if (num == 12)
-		str = ft_strjoin(str, "1");
-	if (num == 10)
-		str = ft_strjoin(str, "0");
-	// if (!str)
-	// {
-	// 	write(0, "Error\n", 6);
-	// 	exit (0);
-	// }
+	else
+	{
+		if (ft_strlen(str) == 8)
+		{
+			ft_printf("%s\n", str);
+			ft_printf("%c", bitoi(str));
+			free(str);
+			str	= malloc(sizeof(char *));
+			str[0] = '\0';
+		}
+		if (num == SIGUSR2)
+			str = newstr(str, "1");
+		if (num == SIGUSR1)
+			str = newstr(str, "0");
+	}
+	if (ft_strncmp(str, "00000000", 8) == 0)
+	{
+		free(str);
+		str = NULL;
+		kill(info->si_pid, SIGUSR2);
+		return ;
+	}
 	kill(info->si_pid, SIGUSR1);
+	// write(1, "h", 1);
+	// sleep(1);
 }
 
 int	main(void)
@@ -72,9 +96,9 @@ int	main(void)
 	ft_printf("%i\n", getpid()); 
 	while (1)
 	{
+		if (str)
+			ft_printf("%s", str);
 		sigaction(SIGUSR1,  &sa, NULL);
-		sigaction(60,  &sa, NULL);
-		sigaction(61,  &sa, NULL);
 		sigaction(SIGUSR2,  &sa, NULL);
 	}
 }
