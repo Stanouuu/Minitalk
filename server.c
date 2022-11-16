@@ -6,7 +6,7 @@
 /*   By: sbarrage <sbarrage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 12:22:17 by sbarrage          #+#    #+#             */
-/*   Updated: 2022/11/15 16:03:33 by sbarrage         ###   ########.fr       */
+/*   Updated: 2022/11/16 16:53:56 by sbarrage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "ft_printf.h"
 #include "libft.h"
 
-char	*str;
+char	*g_str;
 
 int	bitoi(char *str)
 {
@@ -30,79 +30,70 @@ int	bitoi(char *str)
 		res = res * 2 + (str[i] - '0');
 		i++;
 	}
-
 	return (res);
 }
 
 char	*newstr(char *str, char *nbr)
 {
-	char *tmp;
+	char	*tmp;
 
 	tmp = ft_strjoin(str, nbr);
 	free(str);
 	return (tmp);
 }
 
+void	ft_other_option(int num)
+{
+	if (ft_strlen(g_str) == 8)
+	{
+		ft_printf("%c", bitoi(g_str));
+		free(g_str);
+		g_str = malloc(sizeof(char *));
+		g_str[0] = '\0';
+	}
+	if (num == SIGUSR2)
+		g_str = newstr(g_str, "1");
+	if (num == SIGUSR1)
+		g_str = newstr(g_str, "0");
+}
+
 void	action(int num, siginfo_t	*info, void *content)
 {
 	if (content)
 		(void)content;
-
-	// ft_printf("%d\n", info->si_pid);
-	// sleep(1);
-
-	if (num == SIGUSR1 && !str)
+	if (num == SIGUSR2 && !g_str)
 	{
-		str	= malloc(sizeof(char *));
-		str[0] = '\0';
+		g_str = malloc(sizeof(char *));
+		g_str[0] = '\0';
 	}
 	else
 	{
-		if (ft_strlen(str) == 8)
-		{
-			ft_printf("%s\n", str);
-			ft_printf("%c", bitoi(str));
-			free(str);
-			str	= malloc(sizeof(char *));
-			str[0] = '\0';
-		}
-		if (num == SIGUSR2)
-			str = newstr(str, "1");
-		if (num == SIGUSR1)
-			str = newstr(str, "0");
+		ft_other_option(num);
 	}
-	if (ft_strncmp(str, "00000000", 8) == 0)
+	if (ft_strncmp(g_str, "00000000", 8) == 0)
 	{
-		free(str);
-		str = NULL;
-		kill(info->si_pid, SIGUSR2);
+		write(1, "\n", 1);
+		free(g_str);
+		g_str = NULL;
+		kill(info->si_pid, SIGUSR1);
 		return ;
 	}
-	kill(info->si_pid, SIGUSR1);
-	// write(1, "h", 1);
-	// sleep(1);
+	kill(info->si_pid, SIGUSR2);
 }
 
 int	main(void)
 {
-	struct	sigaction sa;
-	
-	str = NULL;
+	struct sigaction	sa;
+
+	g_str = NULL;
 	sigemptyset(&sa.sa_mask);
 	sigaddset(&sa.sa_mask, SIGINT);
 	sa.sa_flags = SA_RESTART | SA_SIGINFO;
 	sa.sa_sigaction = &action;
-
-	ft_printf("%i\n", getpid()); 
+	ft_printf("%i\n", getpid());
 	while (1)
 	{
-		if (str)
-			ft_printf("%s", str);
-		sigaction(SIGUSR1,  &sa, NULL);
-		sigaction(SIGUSR2,  &sa, NULL);
+		sigaction(SIGUSR1, &sa, NULL);
+		sigaction(SIGUSR2, &sa, NULL);
 	}
 }
-
-
-
-
