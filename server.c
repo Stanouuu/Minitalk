@@ -6,7 +6,7 @@
 /*   By: sbarrage <sbarrage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 12:22:17 by sbarrage          #+#    #+#             */
-/*   Updated: 2022/11/16 16:53:56 by sbarrage         ###   ########.fr       */
+/*   Updated: 2022/11/16 18:20:30 by sbarrage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,19 +42,22 @@ char	*newstr(char *str, char *nbr)
 	return (tmp);
 }
 
-void	ft_other_option(int num)
+int	ft_other_option(int num)
 {
 	if (ft_strlen(g_str) == 8)
 	{
 		ft_printf("%c", bitoi(g_str));
 		free(g_str);
 		g_str = malloc(sizeof(char *));
+		if (!g_str)
+			return (0);
 		g_str[0] = '\0';
 	}
 	if (num == SIGUSR2)
 		g_str = newstr(g_str, "1");
 	if (num == SIGUSR1)
 		g_str = newstr(g_str, "0");
+	return (1);
 }
 
 void	action(int num, siginfo_t	*info, void *content)
@@ -64,11 +67,14 @@ void	action(int num, siginfo_t	*info, void *content)
 	if (num == SIGUSR2 && !g_str)
 	{
 		g_str = malloc(sizeof(char *));
+		if (!g_str)
+			return ;
 		g_str[0] = '\0';
 	}
 	else
 	{
-		ft_other_option(num);
+		if (ft_other_option(num) == 0)
+			return ;
 	}
 	if (ft_strncmp(g_str, "00000000", 8) == 0)
 	{
